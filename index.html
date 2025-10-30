@@ -6,78 +6,103 @@
   <title>Debate Club</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #0b1220;
       --accent: #7c3aed;
       --muted: #94a3b8;
-      --glass: rgba(255, 255, 255, 0.04);
+      --glass: rgba(255, 255, 255, 0.06);
       --success: #10b981;
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'Inter', system-ui, sans-serif;
-      background: linear-gradient(180deg, #071029 0%, var(--bg) 100%);
+      background: 
+        linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.7)),
+        url("https://images.unsplash.com/photo-1503428593586-e225b39bddfe?auto=format&fit=crop&w=1500&q=80");
+      background-size: cover;
+      background-position: center;
       color: #e6eef8;
-      padding: 32px;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      padding: 32px;
     }
+
     .container {
       width: 100%;
       max-width: 880px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
       border-radius: 16px;
       padding: 30px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
     }
+
+    /* Logo/Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
     h1 {
       font-size: 28px;
-      margin-bottom: 4px;
+      margin: 0;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
     p {
       color: var(--muted);
-      margin-top: 0;
+      margin-top: 6px;
       font-size: 15px;
+      text-align: center;
     }
+
     form {
-      margin-top: 18px;
+      margin-top: 20px;
     }
-    .field {
-      margin-bottom: 16px;
-    }
+
+    .field { margin-bottom: 16px; }
+
     label {
       display: block;
       font-size: 14px;
       color: var(--muted);
       margin-bottom: 6px;
     }
+
     input, select {
       width: 100%;
       padding: 10px 12px;
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
       background: var(--glass);
       color: white;
       font-size: 15px;
       outline: none;
     }
 
-    /* 👇 Fixed dropdown visibility */
-    select {
-      background-color: rgba(255, 255, 255, 0.15);
-      color: white;
-    }
-    option {
-      background-color: white;
+    select option {
       color: black;
       font-weight: 500;
     }
-    option:hover,
-    option:focus,
-    option:checked {
+    select option:hover {
       font-weight: 700;
     }
 
@@ -92,11 +117,12 @@
       font-weight: 600;
       cursor: pointer;
       margin-top: 8px;
-      box-shadow: 0 6px 18px rgba(124,58,237,0.18);
+      box-shadow: 0 6px 18px rgba(124,58,237,0.25);
     }
     button:hover {
       background: linear-gradient(90deg, #6d28d9, #5b21b6);
     }
+
     .venue {
       text-align: center;
       margin-top: 24px;
@@ -106,7 +132,9 @@
       font-weight: 700;
       color: white;
       font-size: 18px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
+
     .list {
       margin-top: 25px;
       background: rgba(255,255,255,0.03);
@@ -116,7 +144,7 @@
       overflow-y: auto;
     }
     .participant {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.08);
       padding: 10px;
       border-radius: 8px;
       margin-bottom: 10px;
@@ -143,7 +171,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>Debate Club</h1>
+    <div class="header">
+      <div class="logo">DC</div>
+      <h1>Debate Club</h1>
+    </div>
     <p>Enroll for exciting <strong>non-political debates</strong> at <strong>Advita's Garage</strong>.</p>
 
     <form id="enrollForm">
@@ -181,9 +212,7 @@
       <button type="submit">Enroll for Debate</button>
     </form>
 
-    <div class="venue">
-      📍 Venue: Advita's Garage
-    </div>
+    <div class="venue">📍 Venue: <strong>Advita's Garage</strong></div>
 
     <div class="list" id="participantsList">
       <div class="small" id="emptyMsg">No one enrolled yet. Be the first!</div>
@@ -193,7 +222,7 @@
   <div id="toast" class="toast">Enrolled!</div>
 
   <script>
-    const STORAGE_KEY = "debate_club_enrollments_v6";
+    const STORAGE_KEY = "debate_club_enrollments_v7";
     const form = document.getElementById("enrollForm");
     const nameInput = document.getElementById("name");
     const topicSelect = document.getElementById("topic");
@@ -203,7 +232,6 @@
     const emptyMsg = document.getElementById("emptyMsg");
     const toast = document.getElementById("toast");
 
-    // allow only today or future dates
     const today = new Date().toISOString().split("T")[0];
     dateInput.min = today;
 
@@ -224,7 +252,6 @@
 
     function renderList() {
       let items = loadEnrollments();
-      // sort by nearest date first
       items.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
       listEl.innerHTML = "";
       if (items.length === 0) {
