@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debate Club</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #0b1220;
+      --accent: #7c3aed;
+      --muted: #94a3b8;
+      --glass: rgba(255, 255, 255, 0.04);
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(180deg, #071029 0%, var(--bg) 100%);
+      color: #e6eef8;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 880px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+    p {
+      color: var(--muted);
+      margin-top: 0;
+      font-size: 15px;
+    }
+    form {
+      margin-top: 18px;
+    }
+    .field {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: var(--glass);
+      color: white;
+      font-size: 15px;
+      outline: none;
+    }
+
+    /* 👇 Fixed dropdown visibility */
+    select {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+    option {
+      background-color: white;
+      color: black;
+      font-weight: 500;
+    }
+    option:hover,
+    option:focus,
+    option:checked {
+      font-weight: 700;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--accent), #5b21b6);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 6px 18px rgba(124,58,237,0.18);
+    }
+    button:hover {
+      background: linear-gradient(90deg, #6d28d9, #5b21b6);
+    }
+    .venue {
+      text-align: center;
+      margin-top: 24px;
+      background: linear-gradient(90deg, #5b21b6, var(--accent));
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      color: white;
+      font-size: 18px;
+    }
+    .list {
+      margin-top: 25px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 10px;
+      padding: 14px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .participant {
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(16,185,129,0.12);
+      color: var(--success);
+      border: 1px solid rgba(16,185,129,0.2);
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Debate Club</h1>
+    <p>Enroll for exciting <strong>non-political debates</strong> at <strong>Advita's Garage</strong>.</p>
+
+    <form id="enrollForm">
+      <div class="field">
+        <label for="name">Your Name</label>
+        <input id="name" type="text" placeholder="e.g. Riya Kapoor" required>
+      </div>
+
+      <div class="field">
+        <label for="topic">Choose a Non-Political Topic</label>
+        <select id="topic" required>
+          <option value="">— Select a topic —</option>
+          <option>Are books better than movies?</option>
+          <option>Should homework be banned?</option>
+          <option>Do social media apps make us more connected or lonely?</option>
+          <option>Is online learning better than classroom learning?</option>
+          <option>Are uniforms good for students?</option>
+          <option>Should exams test creativity instead of memory?</option>
+          <option>Are video games beneficial for the brain?</option>
+          <option>Can music improve your focus?</option>
+          <option>Should students be graded on teamwork?</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="date">Choose Debate Date</label>
+        <input id="date" type="date" required>
+      </div>
+
+      <div class="field">
+        <label for="time">Choose Debate Time</label>
+        <input id="time" type="time" required>
+      </div>
+
+      <button type="submit">Enroll for Debate</button>
+    </form>
+
+    <div class="venue">
+      📍 Venue: Advita's Garage
+    </div>
+
+    <div class="list" id="participantsList">
+      <div class="small" id="emptyMsg">No one enrolled yet. Be the first!</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Enrolled!</div>
+
+  <script>
+    const STORAGE_KEY = "debate_club_enrollments_v6";
+    const form = document.getElementById("enrollForm");
+    const nameInput = document.getElementById("name");
+    const topicSelect = document.getElementById("topic");
+    const dateInput = document.getElementById("date");
+    const timeInput = document.getElementById("time");
+    const listEl = document.getElementById("participantsList");
+    const emptyMsg = document.getElementById("emptyMsg");
+    const toast = document.getElementById("toast");
+
+    // allow only today or future dates
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.min = today;
+
+    function loadEnrollments() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    }
+    function saveEnrollments(arr) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.style.display = "block";
+      setTimeout(() => (toast.style.display = "none"), 1500);
+    }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    function renderList() {
+      let items = loadEnrollments();
+      // sort by nearest date first
+      items.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+      listEl.innerHTML = "";
+      if (items.length === 0) {
+        listEl.appendChild(emptyMsg);
+        return;
+      }
+      items.forEach((p) => {
+        const div = document.createElement("div");
+        div.className = "participant";
+        div.innerHTML = `
+          <div>
+            <strong>${escapeHtml(p.name)}</strong><br>
+            <span class="small">${escapeHtml(p.topic)}</span><br>
+            <span class="small">${p.date} at ${p.time}</span>
+          </div>
+          <div class="small">${new Date(p.created).toLocaleString()}</div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      const topic = topicSelect.value;
+      const date = dateInput.value;
+      const time = timeInput.value;
+      if (!name || !topic || !date || !time) {
+        showToast("Please fill all fields");
+        return;
+      }
+      const selectedDate = new Date(date);
+      const now = new Date();
+      if (selectedDate < new Date(now.toDateString())) {
+        showToast("Select a future date!");
+        return;
+      }
+      const data = loadEnrollments();
+      data.push({ name, topic, date, time, created: Date.now() });
+      saveEnrollments(data);
+      renderList();
+      showToast("Enrollment successful!");
+      form.reset();
+      nameInput.focus();
+    });
+
+    renderList();
+  </script>
+</body>
+</html>
